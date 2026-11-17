@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ConectaRota - Plataforma de mobilidade e transporte acessível.">
+  <title>ConectaRota - Transporte Mundial</title>
+
+  <link rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top-header">
+  <div class="header-content">
+    <div class="brand">
+      <h1>🌎 ConectaRota</h1>
+      <p data-i18n="tagline">Seu transporte, seu caminho.</p>
+    </div>
+
+    <div class="header-actions">
+      <div class="location-picker">
+        <select id="countrySelect" aria-label="País">
+          <option value="">Carregando países...</option>
+        </select>
+
+        <select id="stateSelect" aria-label="Estado" disabled>
+          <option value="">Escolha o estado</option>
+        </select>
+
+        <select id="citySelect" aria-label="Cidade" disabled>
+          <option value="">Escolha a cidade</option>
+        </select>
+      </div>
+
+      <select id="languageSelect" aria-label="Idioma">
+        <option value="pt">Português</option>
+        <option value="en">English</option>
+        <option value="es">Español</option>
+      </select>
+
+      <button id="decreaseFont" aria-label="Diminuir texto">A−</button>
+      <button id="increaseFont" aria-label="Aumentar texto">A+</button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="intro">
+    <h2 data-i18n="mainTitle">Seu transporte, seu caminho.</h2>
+    <p data-i18n="mainDescription">
+      Consulte opções de transporte e encontre seu caminho.
+    </p>
+  </section>
+
+  <nav class="tabs" aria-label="Navegação principal">
+    <button class="tab active" data-tab="plan" data-i18n="tabPlan">🧭 Planejar viagem</button>
+    <button class="tab" data-tab="lines" data-i18n="tabLines">🚌 Linhas urbanas</button>
+    <button class="tab" data-tab="schedules" data-i18n="tabSchedules">🕒 Horários</button>
+    <button class="tab" data-tab="accessibility" data-i18n="tabAccessibility">♿ Acessibilidade</button>
+    <button class="tab" data-tab="intercity" data-i18n="tabIntercity">🚍 Intermunicipal</button>
+  </nav>
+
+  <section class="content-grid">
+
+    <div class="left-panel">
+
+      <section class="tab-content active" id="plan">
+        <h2 data-i18n="tabPlan">Planejar viagem</h2>
+
+        <label for="origin" data-i18n="originLabel">De onde você vai sair?</label>
+        <input id="origin" type="text"
+          data-i18n-placeholder="originPlaceholder"
+          placeholder="Ex.: Praça Central">
+
+        <label for="destination" data-i18n="destinationLabel">Para onde você quer ir?</label>
+        <input id="destination" type="text"
+          data-i18n-placeholder="destinationPlaceholder"
+          placeholder="Ex.: Universidade">
+
+        <div class="button-row">
+          <button id="myLocation" data-i18n="myLocation">📍 Minha localização</button>
+          <button id="swapLocations" data-i18n="swap">Trocar</button>
+        </div>
+
+        <button id="searchRoute" class="primary-button" data-i18n="searchRoute">
+          Pesquisar caminho
+        </button>
+
+        <div id="routeStatus" class="status" role="status"
+          data-i18n="routeInitial">
+          Escolha a origem e o destino para pesquisar.
+        </div>
+
+        <div id="routeResults"></div>
+
+        <p class="small-note" data-i18n="routeNote">
+          A rota desta ferramenta é de caminhada. Ela não representa
+          o trajeto de um ônibus.
+        </p>
+      </section>
+
+      <section class="tab-content" id="lines">
+        <h2 data-i18n="tabLines">Linhas urbanas</h2>
+        <p data-i18n="linesDescription">
+          Consulte as linhas de transporte público da cidade selecionada.
+        </p>
+
+        <div id="urbanLines" class="info-card">
+          <h3 data-i18n="tabLines">Linhas urbanas</h3>
+          <p data-i18n="linesUnavailable">
+            Ainda não há uma base de linhas urbanas confirmada
+            para esta cidade.
+          </p>
+        </div>
+      </section>
+
+      <section class="tab-content" id="schedules">
+        <h2 data-i18n="tabSchedules">Horários</h2>
+        <p data-i18n="scheduleDescription">
+          Consulte os horários publicados pelas operadoras locais.
+        </p>
+
+        <div id="scheduleContent" class="info-card">
+          <h3 data-i18n="scheduleTitle">Horários disponíveis</h3>
+          <p data-i18n="scheduleWarning">
+            Os horários precisam ser confirmados com a operadora
+            antes de serem apresentados como atuais.
+          </p>
+        </div>
+      </section>
+
+      <section class="tab-content" id="accessibility">
+        <h2 data-i18n="tabAccessibility">Acessibilidade</h2>
+
+        <div class="info-card">
+          <h3 data-i18n="accessibleTransport">Transporte acessível</h3>
+          <p data-i18n="accessDescription">
+            Consulte informações sobre veículos adaptados,
+            elevadores, rampas e pontos acessíveis.
+          </p>
+          <p data-i18n="accessConfirmation">
+            Os recursos só serão identificados como disponíveis
+            quando houver confirmação dos dados da operadora.
+          </p>
+        </div>
+
+        <div class="accessibility-controls">
+          <button id="highContrast" data-i18n="highContrast">Alto contraste</button>
+          <button id="colorBlindMode" data-i18n="colorBlind">Cores acessíveis</button>
+          <button id="normalColors" data-i18n="normalColors">Cores normais</button>
+        </div>
+      </section>
+
+      <section class="tab-content" id="intercity">
+        <h2 data-i18n="intercityTitle">Transporte intermunicipal</h2>
+        <p data-i18n="intercityDescription">Pesquise viagens entre cidades.</p>
+
+        <label for="intercityOrigin" data-i18n="cityOrigin">Cidade de origem</label>
+        <input id="intercityOrigin" type="text"
+          data-i18n-placeholder="cityOriginPlaceholder"
+          placeholder="Ex.: Laranjeiras do Sul">
+
+        <label for="intercityDestination" data-i18n="cityDestination">Cidade de destino</label>
+        <input id="intercityDestination" type="text"
+          data-i18n-placeholder="cityDestinationPlaceholder"
+          placeholder="Ex.: Londrina">
+
+        <button id="searchIntercity" class="primary-button" data-i18n="searchIntercity">
+          Consultar viagem
+        </button>
+
+        <div id="intercityResult" class="status" role="status"
+          data-i18n="intercityInitial">
+          Informe as cidades para pesquisar.
+        </div>
+      </section>
+
+    </div>
+
+    <section class="map-card">
+      <div class="map-heading">
+        <h2 data-i18n="mapTitle">Mapa de localização</h2>
+        <p id="mapLocationName">Laranjeiras do Sul, Paraná</p>
+      </div>
+
+      <div id="map"></div>
+
+      <div class="map-footer">
+        <span data-i18n="worldMap">Mapa mundial</span>
+        <span>© Esri e colaboradores</span>
+      </div>
+    </section>
+
+  </section>
+
+  <footer>
+    <p data-i18n="footer">ConectaRota — Mobilidade e acessibilidade.</p>
+  </footer>
+
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
